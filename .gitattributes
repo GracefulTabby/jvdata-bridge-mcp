@@ -1,0 +1,2 @@
+# Versioned model checksums use the same UTF-8/LF bytes on every OS.
+src/jvdata_bridge_mcp/ml/models/*.json text eol=lf

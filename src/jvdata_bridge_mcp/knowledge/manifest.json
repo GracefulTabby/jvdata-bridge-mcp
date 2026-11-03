@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "resources": [
+    {
+      "uri": "jvdata://knowledge/spec/procedures/forecast-discipline",
+      "name": "spec-procedure-forecast-discipline",
+      "title": "競馬予想手順：予想規律・データ・証拠",
+      "description": "予想の目的、データ品質、証拠・反証、不確実性、Factの扱い。",
+      "kind": "procedure",
+      "status": "published",
+      "path": "spec/forecast-discipline.md",
+      "supporting_evidence_periods": [
+        {
+          "start": "2026-07-19",
+          "end": "2026-09-22",
+          "sample_size": 72,
+          "kind": "exploratory_issue_audit",
+          "scope": "operational_checks_only; predictive_gain_not_evaluated; full_text_support_not_established",
+          "evidence_timing": "post_race_results"
+        },
+        {
+          "start": "2025-01-12",
+          "end": "2025-12-21",
+          "sample_size": 300,
+          "kind": "exploratory_issue_audit",
+          "scope": "condition_specific_cautions_only; selected_25_venue_days; predictive_gain_and_stable_venue_bias_not_evaluated; full_text_support_not_established",
+          "evidence_timing": "post_race_results"
+        }
+      ]
+    },
+    {
+      "uri": "jvdata://knowledge/spec/procedures/scenario-and-output",
+      "name": "spec-procedure-scenario-and-output",
+      "title": "競馬予想手順：シナリオ・出力・分析の役割",
+      "description": "ペースシナリオ、予想出力、各分析役割の受け渡し。",
+      "kind": "procedure",
+      "status": "published",
+      "path": "spec/scenario-and-output.md",
+      "supporting_evidence_periods": [
+        {
+          "start": "2026-07-19",
+          "end": "2026-09-22",
+          "sample_size": 72,
+          "kind": "exploratory_issue_audit",
+          "scope": "operational_checks_only; predictive_gain_not_evaluated; full_text_support_not_established",
+          "evidence_timing": "post_race_results"
+        },
+        {
+          "start": "2025-01-12",
+          "end": "2025-12-21",
+          "sample_size": 300,
+          "kind": "exploratory_issue_audit",
+          "scope": "condition_specific_cautions_only; selected_25_venue_days; predictive_gain_and_stable_venue_bias_not_evaluated; full_text_support_not_established",
+          "evidence_timing": "post_race_results"
+        }
+      ]
+    },
+    {
+      "uri": "jvdata://knowledge/spec/procedures/post-race-review",
+      "name": "spec-procedure-post-race-review",
+      "title": "競馬予想手順：レース後レビュー・知識管理",
+      "description": "改訂履歴、事後レビュー、ナレッジ管理・検索・競合解消。",
+      "kind": "procedure",
+      "status": "published",
+      "path": "spec/post-race-review.md",
+      "supporting_evidence_periods": [
+        {
+          "start": "2026-07-19",
+          "end": "2026-09-22",
+          "sample_size": 72,
+          "kind": "exploratory_issue_audit",
+          "scope": "operational_checks_only; predictive_gain_not_evaluated; full_text_support_not_established",
+          "evidence_timing": "post_race_results"
+        },
+        {
+          "start": "2025-01-12",
+          "end": "2025-12-21",
+          "sample_size": 300,
+          "kind": "exploratory_issue_audit",
+          "scope": "condition_specific_cautions_only; selected_25_venue_days; predictive_gain_and_stable_venue_bias_not_evaluated; full_text_support_not_established",
+          "evidence_timing": "post_race_results"
+        }
+      ]
+    },
+    {
+      "uri": "jvdata://knowledge/spec/knowledge/horse-evaluation",
+      "name": "spec-knowledge-horse-evaluation",
+      "title": "競馬予想知識：馬の評価",
+      "description": "能力、クラス・距離・馬場適性、フォーム、調教、騎手・厩舎、血統、馬体・斤量。",
+      "kind": "knowledge",
+      "status": "published",
+      "path": "spec/horse-evaluation.md",
+      "supporting_evidence_periods": [
+        {
+          "start": "2026-07-19",
+          "end": "2026-09-22",
+          "sample_size": 72,
+          "kind": "exploratory_issue_audit",
+          "scope": "operational_checks_only; predictive_gain_not_evaluated; full_text_support_not_established",
+          "evidence_timing": "post_race_results"
+        },
+        {
+          "start": "2025-01-12",
+          "end": "2025-12-21",
+          "sample_size": 300,
+          "kind": "exploratory_issue_audit",
+          "scope": "condition_specific_cautions_only; selected_25_venue_days; predictive_gain_and_stable_venue_bias_not_evaluated; full_text_support_not_established",
+          "evidence_timing": "post_race_results"
+        }
+      ]
+    },
+    {
+      "uri": "jvdata://knowledge/spec/knowledge/race-structure",
+      "name": "spec-knowledge-race-structure",
+      "title": "競馬予想知識：コース・レース構造",
+      "description": "コース適性、ペース、位置取り、展開、枠、開催・当日の傾向。",
+      "kind": "knowledge",
+      "status": "published",
+      "path": "spec/race-structure.md",
+      "supporting_evidence_periods": [
+        {
+          "start": "2026-07-19",
+          "end": "2026-09-22",
+          "sample_size": 72,
+          "kind": "exploratory_issue_audit",
+          "scope": "operational_checks_only; predictive_gain_not_evaluated; full_text_support_not_established",
+          "evidence_timing": "post_race_results"
+        },
+        {
+          "start": "2025-01-12",
+          "end": "2025-12-21",
+          "sample_size": 300,
+          "kind": "exploratory_issue_audit",
+          "scope": "condition_specific_cautions_only; selected_25_venue_days; predictive_gain_and_stable_venue_bias_not_evaluated; full_text_support_not_established",
+          "evidence_timing": "post_race_results"
+        }
+      ]
+    },
+    {
+      "uri": "jvdata://knowledge/spec/knowledge/market-and-bets",
+      "name": "spec-knowledge-market-and-bets",
+      "title": "競馬予想知識：市場評価・馬券構築",
+      "description": "市場と能力評価の分離、オッズ、印、券種、買い目、シナリオ別ポートフォリオ。",
+      "kind": "knowledge",
+      "status": "published",
+      "path": "spec/market-and-bets.md",
+      "supporting_evidence_periods": [
+        {
+          "start": "2026-07-19",
+          "end": "2026-09-22",
+          "sample_size": 72,
+          "kind": "exploratory_issue_audit",
+          "scope": "operational_checks_only; predictive_gain_not_evaluated; full_text_support_not_established",
+          "evidence_timing": "post_race_results"
+        },
+        {
+          "start": "2025-01-12",
+          "end": "2025-12-21",
+          "sample_size": 300,
+          "kind": "exploratory_issue_audit",
+          "scope": "condition_specific_cautions_only; selected_25_venue_days; predictive_gain_and_stable_venue_bias_not_evaluated; full_text_support_not_established",
+          "evidence_timing": "post_race_results"
+        }
+      ]
+    }
+  ]
+}

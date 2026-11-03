@@ -1,0 +1,15 @@
+services:
+  jvdata-bridge-mcp:
+    build: .
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    volumes:
+      - prediction-models:/home/app/.cache/jvdata-bridge-mcp/models
+
+volumes:
+  prediction-models:
