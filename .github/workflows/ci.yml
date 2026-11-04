@@ -49,3 +49,46 @@ jobs:
 
       - name: Validate bundled prediction model
         run: uv run python scripts/validate_model_bundle.py
+
+  dependency-audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "latest"
+      - name: Audit locked runtime, development and research dependencies
+        run: |
+          uv export --frozen --all-groups --all-extras --no-emit-project --output-file dependency-audit.txt --quiet
+          uvx --from pip-audit==2.10.1 pip-audit --requirement dependency-audit.txt --disable-pip --require-hashes --progress-spinner off
+
+  windows-postgres:
+    name: Windows PostgreSQL / Python ${{ matrix.python-version }}
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.13"]
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "latest"
+      - name: Install dependencies
+        run: uv sync --locked --all-groups
+      - name: Test doctor, stdio and HTTP against PostgreSQL
+        shell: pwsh
+        run: ./scripts/test_windows_postgres.ps1

@@ -24,6 +24,15 @@ uv lock --check
 git diff --check
 ```
 
+Windowsの実DB接続は、PostgreSQLのインストールと依存同期後に次の手順で検証します。
+専用の一時クラスター・DB・読み取りユーザーを作り、`doctor`、stdio、Streamable HTTPからのSELECTと書き込みSQLの拒否を確認します。
+
+```powershell
+./scripts/test_windows_postgres.ps1
+```
+
+PostgreSQLの検出先を指定する場合は`-PostgresBin`を使用します。検証用DBは製品DBと分離します。
+
 MCPクライアントから見える `tools/list` のツール名、説明、入力スキーマ、出力スキーマは
 公開面です。変更した場合は `uv run python scripts/update_tool_schemas.py` で全ツールの
 JSONスキーマとツールリファレンスを再生成し、用途・取得範囲などの説明も確認してください。
