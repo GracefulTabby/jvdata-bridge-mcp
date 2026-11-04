@@ -444,9 +444,9 @@ def study_pace_position_consistency(
     import pandas as pd
 
     position = pd.read_parquet(output / "positions.parquet")
-    features = pd.read_parquet(features)
+    feature_frame = pd.read_parquet(features)
     descriptors = pd.read_parquet(output / "representative-pace-features.parquet")
-    pace = features.merge(descriptors, on=["race_id", "horse_id"], validate="one_to_one")
+    pace = feature_frame.merge(descriptors, on=["race_id", "horse_id"], validate="one_to_one")
     fields = pace.groupby("race_id", sort=False).agg(
         race_date=("race_date", "first"),
         observed_z=("pace_z", "first"),

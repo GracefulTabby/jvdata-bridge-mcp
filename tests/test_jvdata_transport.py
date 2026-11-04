@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import os
 import signal
 import socket
@@ -13,6 +14,7 @@ from pathlib import Path
 from typing import Any
 
 import httpx
+import pytest
 from mcp import ClientSession
 from mcp.client.stdio import StdioServerParameters, stdio_client
 from mcp.client.streamable_http import streamable_http_client
@@ -23,7 +25,7 @@ SERVER_COMMAND: Path = Path(sys.executable).with_name("jvdata-bridge-mcp")
 RACE_CODE: str = "2026080907020612"
 
 
-def _test_environment() -> dict[str, str]:
+def _test_environment(database_url: str | None = None) -> dict[str, str]:
     """接続失敗を短時間で構造化エラーへ変換するテスト環境を作る。"""
 
     environment: dict[str, str] = {
@@ -31,7 +33,7 @@ def _test_environment() -> dict[str, str]:
     }
     environment.update(
         {
-            "JVDATA_BRIDGE_MCP_DATABASE_URL": "postgresql+psycopg://reader@127.0.0.1:1/jvdata",
+            "JVDATA_BRIDGE_MCP_DATABASE_URL": database_url or "postgresql+psycopg://reader@127.0.0.1:1/jvdata",
             "JVDATA_BRIDGE_MCP_CONNECT_TIMEOUT_SECONDS": "1",
         }
     )
@@ -97,7 +99,7 @@ def _free_port() -> int:
         return int(sock.getsockname()[1])
 
 
-def _start_http_server(port: int) -> subprocess.Popen[str]:
+def _start_http_server(port: int, *, database_url: str | None = None) -> subprocess.Popen[str]:
     """テスト用Streamable HTTPプロセスを起動する。"""
 
     return subprocess.Popen(
@@ -116,7 +118,7 @@ def _start_http_server(port: int) -> subprocess.Popen[str]:
             str(port),
         ],
         cwd=REPOSITORY_ROOT,
-        env=_test_environment(),
+        env=_test_environment(database_url),
         start_new_session=os.name == "posix",
         creationflags=getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0) if os.name == "nt" else 0,
         stdout=subprocess.PIPE,
@@ -231,3 +233,87 @@ def test_streamable_http_protocol_surface() -> None:
     """Streamable HTTPはcanonical 50ツール一覧を返す。"""
 
     _exercise_http()
+
+
+@pytest.fixture
+def postgres_url() -> str:
+    """専用のPostgreSQL検証環境が指定された場合だけ実接続を行う。"""
+
+    value = os.environ.get("JVDATA_MCP_TEST_DATABASE_URL")
+    if not value:
+        pytest.skip("Set JVDATA_MCP_TEST_DATABASE_URL to an isolated test database.")
+    return value
+
+
+async def _assert_postgres_query(session: ClientSession) -> None:
+    """実DBへのSELECTと、MCP境界での書き込みSQL拒否を確認する。"""
+
+    await session.initialize()
+    result = await session.call_tool(
+        "sql_execute_custom_query",
+        {"sql": "SELECT race_id FROM jv_data.races ORDER BY race_id"},
+    )
+    assert result.isError is False
+    assert result.structuredContent is not None
+    assert result.structuredContent["rows"] == [{"race_id": "integration-race"}]
+    rejected = await session.call_tool("sql_execute_custom_query", {"sql": "DELETE FROM jv_data.races"})
+    assert rejected.isError is True
+
+
+def test_postgres_doctor_connects_read_only(postgres_url: str) -> None:
+    """doctorの通常起動で実DBへ接続し、read-only transactionを使う。"""
+
+    result = subprocess.run(
+        [sys.executable, "-m", "jvdata_bridge_mcp.cli", "doctor"],
+        cwd=REPOSITORY_ROOT,
+        env=_test_environment(postgres_url),
+        capture_output=True,
+        text=True,
+        timeout=20,
+        check=False,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    payload = json.loads(result.stdout)
+    assert payload["ok"] is True
+    assert payload["database"]["transaction_read_only"] is True
+
+
+def test_postgres_stdio_query(postgres_url: str) -> None:
+    """stdioサーバーの起動経路から実DBを参照する。"""
+
+    async def exercise() -> None:
+        parameters = StdioServerParameters(
+            command=sys.executable,
+            args=["-m", "jvdata_bridge_mcp.cli", "stdio"],
+            env=_test_environment(postgres_url),
+            cwd=REPOSITORY_ROOT,
+        )
+        async with stdio_client(parameters) as (read_stream, write_stream):
+            async with ClientSession(read_stream, write_stream) as session:
+                await asyncio.wait_for(_assert_postgres_query(session), timeout=20)
+
+    asyncio.run(exercise())
+
+
+def test_postgres_streamable_http_query(postgres_url: str) -> None:
+    """HTTPサーバーの起動経路から実DBを参照する。"""
+
+    port = _free_port()
+    process = _start_http_server(port, database_url=postgres_url)
+    server_pid = None
+    try:
+        server_pid = _wait_for_health(port, process)["pid"]
+
+        async def exercise() -> None:
+            async with httpx.AsyncClient(timeout=20, trust_env=False) as client:
+                async with streamable_http_client(f"http://127.0.0.1:{port}/mcp", http_client=client) as (
+                    read_stream,
+                    write_stream,
+                    _,
+                ):
+                    async with ClientSession(read_stream, write_stream) as session:
+                        await asyncio.wait_for(_assert_postgres_query(session), timeout=20)
+
+        asyncio.run(exercise())
+    finally:
+        _terminate_http_process(process, server_pid)

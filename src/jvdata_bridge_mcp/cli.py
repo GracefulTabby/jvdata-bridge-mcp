@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import asyncio
 import json
 import logging
 import os
@@ -20,6 +19,7 @@ from urllib.request import ProxyHandler, Request, build_opener
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
+from jvdata_bridge_mcp.async_runtime import run_async
 from jvdata_bridge_mcp.config import (
     DATA_SCHEMA,
     MART_SCHEMA,
@@ -437,7 +437,7 @@ async def _doctor_async() -> int:
 def _doctor() -> int:
     """同期CLIエントリーポイントから非同期doctor処理を実行する。"""
 
-    return asyncio.run(_doctor_async())
+    return run_async(_doctor_async)
 
 
 def _status(args: argparse.Namespace) -> int:

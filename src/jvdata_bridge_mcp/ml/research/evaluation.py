@@ -42,7 +42,7 @@ def monthly_comparisons(comparison: dict[str, Any], frame: pd.DataFrame) -> dict
         name: {row["race_id"]: row for row in comparison[name]["per_race"]} for name in ("candidate", "baseline")
     }
     common = set(lookup["candidate"]) & set(lookup["baseline"])
-    frame = frame[frame.race_id.isin(common)]
+    frame = frame.loc[frame.race_id.isin(common), :]
     dates = dict(zip(frame.race_id, frame.race_date, strict=True))
     result = {}
     for month, part in frame.groupby(frame.race_date.str[:7], sort=True):

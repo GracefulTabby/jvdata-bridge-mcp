@@ -13,6 +13,7 @@ from mcp.types import ToolAnnotations
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 
+from jvdata_bridge_mcp.async_runtime import run_async
 from jvdata_bridge_mcp.config import JvDataSettings
 from jvdata_bridge_mcp.database import JvDataDatabase
 from jvdata_bridge_mcp.knowledge_resources import load_knowledge_resources
@@ -121,7 +122,12 @@ def run_server(
         started_at=started_at,
     )
     logger.info("Starting %s with %s transport", SERVER_NAME, transport)
-    server.run(transport)
+    if transport == "stdio":
+        run_async(server.run_stdio_async)
+    elif transport == "streamable-http":
+        run_async(server.run_streamable_http_async)
+    else:
+        raise ValueError(f"unsupported transport: {transport}")
 
 
 def main() -> None:
